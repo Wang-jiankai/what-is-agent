@@ -2,78 +2,109 @@
  * 01-basic.ts — Agent 基础示例
  *
  * 本章知识点：concepts/01 - 什么是 Agent？
+ *
  * 本示例展示一个最简单的 Agent 具备的四个核心要素：
  *   - 感知（接收用户输入）
  *   - 思考（LLM 推理）
  *   - 行动（调用工具）
  *   - 反馈（根据结果调整）
+ *
+ * 运行方式：
+ *   npm install
+ *   npx ts-node examples/01-basic.ts
+ *
+ * 前置要求：设置环境变量 ANTHROPIC_API_KEY
  */
 
-import { Agent } from "@anthropic-ai/claude-code";
+import { query } from "@anthropic-ai/claude-agent-sdk";
 
 // ============================================================
-// 步骤 1：定义工具（Act - 行动）
+// 工具说明
 // ============================================================
-// 注意：以下工具均为【模拟实现】，仅供学习理解 Agent 工具调用机制
-// 真实项目中请使用真实的搜索 API、计算库等
-
-const tools = {
-  // 搜索工具：模拟网页搜索（占位实现，非真实搜索）
-  async search(query: string) {
-    console.log(`🔍 执行搜索: "${query}"`);
-    // ⚠️ 占位实现 —— 这里返回的是假数据
-    // 真实场景应调用 Google Search API、Bing API 等
-    return `搜索结果：关于 "${query}" 的相关信息...`;
-  },
-
-  // 计算工具：使用 Function 替代 eval()，避免 eval() 安全风险
-  // ⚠️ 注意：此实现仅适用于简单数学表达式，教学演示用
-  //        真实环境请使用专门的数学表达式解析库（如 mathjs）
-  async calculate(expression: string) {
-    console.log(`🧮 执行计算: ${expression}`);
-    try {
-      // 使用 Function 构造器比直接 eval() 稍安全（不访问局部作用域）
-      // 但仍然是【教学演示用途】，生产环境禁止使用
-      const safeEval = new Function(`return (${expression})`);
-      return safeEval();
-    } catch {
-      return "计算表达式格式错误";
-    }
-  }
-};
+// Claude Agent SDK 内置了以下工具，开箱即用：
+//   - Read   ：读取文件内容
+//   - Edit   ：编辑文件
+//   - Write  ：写入文件
+//   - Bash   ：执行终端命令
+//   - Glob   ：按模式匹配文件
+//   - Grep   ：搜索文件内容
+//   - WebSearch：联网搜索
+//
+// 本示例使用 allowedTools 控制 Agent 可以调用哪些工具。
+// 你可以把 allowedTools 看成 Agent 的"手"——没有工具，Agent 只能空想。
 
 // ============================================================
-// 步骤 2：创建 Agent 实例（感知 + 思考）
-// ============================================================
-const agent = new Agent({
-  model: "claude-opus-4-6",
-  tools,
-  systemPrompt: `你是一个乐于助人的 AI 助手。
-当你收到用户问题时，可以通过工具来帮助你回答。
-Available tools: search, calculate。`
-});
-
-// ============================================================
-// 步骤 3：运行 Agent（反馈循环）
+// 运行 Agent（感知 → 思考 → 行动 → 反馈 循环）
 // ============================================================
 async function main() {
   console.log("🤖 Agent 启动...\n");
+  console.log("提示：确保已设置 ANTHROPIC_API_KEY 环境变量\n");
 
-  // 问题 1：需要搜索信息
-  const result1 = await agent.run("北京的人口大约有多少？");
-  console.log("\n📤 Agent 回答:", result1);
+  // --------------------------------------------------
+  // 示例 1：简单问答（只允许 Bash 工具）
+  // Agent 通过 LLM 推理直接回答，不需要调用外部工具
+  // --------------------------------------------------
+  console.log("=== 示例 1：简单问答（无需工具） ===\n");
 
-  // 问题 2：需要计算
-  const result2 = await agent.run(
-    "如果我有 15 个苹果，送给朋友 7 个，还剩多少？"
-  );
-  console.log("\n📤 Agent 回答:", result2);
+  for await (const message of query({
+    prompt: "北京的人口大约有多少？请给出一个大概的数字。",
+    options: {
+      // 只允许 Bash 工具（这里不会用到，只是演示 allowedTools 语法）
+      allowedTools: ["Bash"],
+    },
+  })) {
+    // message 是流式输出的片段，可能是文本、工具调用或最终结果
+    console.log(message);
+  }
 
-  // 问题 3：组合问题
-  const result3 = await agent.run(
-    "世界上最长的河流是哪个？它的长度大约是多少公里？"
-  );
-  console.log("\n📤 Agent 回答:", result3);
+  // --------------------------------------------------
+  // 示例 2：Agent 调用内置工具（感知 → 行动）
+  // Agent 发现需要信息，主动调用 WebSearch 工具
+  // --------------------------------------------------
+  console.log("\n=== 示例 2：Agent 调用工具（感知 + 行动） ===\n");
+
+  for await (const message of query({
+    prompt: "搜索一下今天 GitHub 热门项目的标题，返回前 3 个。",
+    options: {
+      // 允许 Agent 使用的工具列表
+      allowedTools: ["WebSearch", "Bash", "Read", "Edit", "Write"],
+    },
+  })) {
+    console.log(message);
+  }
+
+  // --------------------------------------------------
+  // 示例 3：让 Agent 操作文件系统（真实的反馈循环）
+  // Agent 会：读取文件 → 分析内容 → 写入结果
+  // --------------------------------------------------
+  console.log("\n=== 示例 3：Agent 操作文件系统 ===\n");
+
+  // 创建一个测试文件，供 Agent 读取和操作
+  const fs = await import("fs");
+
+  if (!fs.existsSync("./tmp")) {
+    fs.mkdirSync("./tmp");
+  }
+  fs.writeFileSync("./tmp/test.txt", "Hello, Agent!");
+
+  for await (const message of query({
+    prompt:
+      "读取 ./tmp/test.txt 文件，然后在文件末尾追加一行 'Agent 已完成操作'。",
+    options: {
+      allowedTools: ["Read", "Edit", "Write", "Bash"],
+      // cwd 指定 Agent 的工作目录
+      cwd: process.cwd(),
+    },
+  })) {
+    console.log(message);
+  }
+
+  // 验证结果
+  const result = fs.readFileSync("./tmp/test.txt", "utf-8");
+  console.log("\n📄 文件最终内容：", result);
+
+  // 清理
+  fs.rmSync("./tmp", { recursive: true });
 }
 
 main().catch(console.error);

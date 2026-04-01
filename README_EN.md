@@ -4,6 +4,10 @@
 
 ---
 
+> 🌐 **Language**: [中文](./README.md) | [English（当前）](./README_EN.md)
+
+---
+
 ## 📚 Series Repositories
 
 This series contains three repositories to help you master the core concepts of Claude Code:
@@ -27,13 +31,31 @@ An **Agent** is a system that can:
 
 > **In simple terms:** **Agent = Brain (LLM) + Tools + Memory + Planning**
 
-### Common Agent Frameworks Comparison
+### Framework Selection
 
-| Framework | Characteristics | Best For |
-|-----------|----------------|---------|
-| **Claude Agent** | Safety-first, stable, supports multi-turn conversation | General tasks, code assistant |
+This repository uses **Claude Agent SDK** as the primary teaching framework.
+
+| Item | Details |
+|------|---------|
+| **Package** | `@anthropic-ai/claude-agent-sdk` |
+| **Latest Version** | v0.2.83 (2026-04-02) |
+| **Repository** | [github.com/anthropics/claude-agent-sdk](https://github.com/anthropics/claude-agent-sdk) |
+| **Positioning** | Anthropic official SDK, same底层 architecture as Claude Code |
+| **Features** | Enterprise-grade, native MCP integration, lifecycle hooks, streaming output |
+
+> **Why not other frameworks?**
+> - LangGraph: Most mature but complex configuration, steep learning curve
+> - CrewAI: Easiest to start but less flexible
+> - AutoGen: Microsoft-backed but complex setup
+> - OpenAI Swarm: **Discontinued** — no longer maintained
+
+### Common Agent Design Patterns
+
+| Pattern | Characteristics | Best For |
+|---------|----------------|---------|
 | **ReAct** | Combines reasoning and action in a loop | Complex multi-step tasks |
 | **Plan-and-Execute** | Plan first, then execute | Tasks requiring global planning |
+| **Claude Agent SDK** | Official standard, streaming, MCP integration | Production-grade applications |
 
 ---
 
@@ -61,52 +83,38 @@ Understand the design philosophy and best-fit scenarios of different Agent frame
 ### Basic Agent
 
 ```typescript
-import { Agent } from "@anthropic-ai/claude-code";
+import { query } from "@anthropic-ai/claude-agent-sdk";
 
-// Define available tools
-const tools = {
-  async search(query: string) {
-    return `Search results for "${query}"...`;
-  },
-  async calculate(expression: string) {
-    return eval(expression);
+// Run Agent (streaming output)
+for await (const message of query({
+  prompt: "What is the approximate population of Beijing?",
+  options: {
+    allowedTools: ["Bash", "Read", "Edit", "Write"]  // Allowed tools
   }
-};
-
-// Create an Agent instance
-const agent = new Agent({
-  model: "claude-opus-4-6",
-  tools,
-  systemPrompt: "You are a helpful assistant skilled at answering questions and solving problems."
-});
-
-// Run the Agent
-const result = await agent.run("What is the population of Beijing?");
-console.log(result);
+})) {
+  console.log(message);
+}
 ```
 
-### Agent with Planning
+### Agent with Tools and System Prompt
 
 ```typescript
-import { Agent } from "@anthropic-ai/claude-code";
+import { query } from "@anthropic-ai/claude-agent-sdk";
 
-const agent = new Agent({
-  model: "claude-opus-4-6",
-  tools: {
-    search,
-    readFile,
-    writeFile,
-    executeCommand
-  },
-  systemPrompt: `You are a professional software engineer.
-    When given a task, first plan the steps, then execute them in order.`
-});
-
-// Complex task: automatically set up a project
-await agent.run(
-  "Create a TypeScript project with an Express server and React frontend for me"
-);
+// Configure Agent behavior with system prompt
+for await (const message of query({
+  prompt: "Create a simple HTTP server listening on port 3000 for me",
+  options: {
+    allowedTools: ["Bash", "Read", "Edit", "Write", "Glob", "Grep"],
+    systemPrompt: `You are a professional software engineer.
+      When given a task, first plan the steps, then execute them in order.`
+  }
+})) {
+  console.log(message);
+}
 ```
+
+> These are **real API** examples. Claude Agent SDK uses a streaming `query()` function, not a class-based `new Agent()` pattern.
 
 ---
 
@@ -225,9 +233,10 @@ Repeat until all 5 chapters are complete.
 
 ## 📖 Further Learning
 
-- [Claude Agent Official Docs](https://docs.anthropic.com/claude-code)
+- [Claude Agent SDK Official Docs](https://github.com/anthropics/claude-agent-sdk)
 - [Agent Architecture Design Guide](https://github.com/anthropics/anthropic-cookbook)
 - [Stanford AI Agent Paper](https://arxiv.org/abs/2308.03688)
+- [MCP Official Protocol](https://modelcontextprotocol.io)
 
 ---
 

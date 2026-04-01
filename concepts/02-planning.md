@@ -94,6 +94,20 @@ Loop:
 
 ---
 
+## 💡 systemPrompt 与结构化指令
+
+规划模式是通过 `systemPrompt` 来实现的。具体做法是把"先计划再执行"或"边做边想"的要求写在 `systemPrompt` 里。
+
+`systemPrompt` 决定了 Agent 的行为方式。把行为规范写成清晰的结构化指令，就是一种"**结构化提示词**的实践。
+
+如果你想深入学习如何写高质量的结构化指令（把专家经验固化成 SOP），请参考：
+
+> 🔗 [what-is-skill 仓库：Agent Skills SOP 设计课](../what-is-skill/README.md)
+>
+> 那里会教你怎么把"怎么做"的流程写成结构化文档，让 Agent 每次都按你的方式执行。
+
+---
+
 ## 💡 生活中的类比
 
 想象你要**组织一次旅行**：

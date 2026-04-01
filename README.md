@@ -4,6 +4,10 @@
 
 ---
 
+> 🌐 **Language**: [English](./README_EN.md)
+
+---
+
 ## 📚 系列仓库
 
 本系列共三个仓库，帮你系统掌握 Claude Code 的核心概念：
@@ -27,13 +31,31 @@
 
 > 简单来说：**Agent = 大脑（LLM）+ 工具 + 记忆 + 规划能力**
 
-### 常见 Agent 框架对比
+### 技术框架说明
 
-| 框架 | 特点 | 适用场景 |
+本仓库选用 **Claude Agent SDK** 作为主要教学框架。
+
+| 项目 | 详情 |
+|------|------|
+| **包名** | `@anthropic-ai/claude-agent-sdk` |
+| **最新版本** | v0.2.83（2026-04-02） |
+| **官网** | [github.com/anthropics/claude-agent-sdk](https://github.com/anthropics/claude-agent-sdk) |
+| **定位** | Anthropic 官方 SDK，Claude Code 同款底层架构 |
+| **特点** | 企业级、MCP 原生集成、生命周期钩子、流式输出 |
+
+> **为什么不选其他框架？**
+> - LangGraph：最成熟但配置复杂，学习曲线陡
+> - CrewAI：上手最简单但灵活性差
+> - AutoGen：微软背书但配置复杂，对非程序员不友好
+> - OpenAI Swarm：已停止维护
+
+### 常见 Agent 设计模式
+
+| 模式 | 特点 | 适用场景 |
 |------|------|---------|
-| **Claude Agent** | 注重安全性与稳定性，支持多轮对话 | 通用任务、代码助手 |
 | **ReAct** | 结合推理与行动，循环执行 | 复杂多步骤任务 |
 | **Plan-and-Execute** | 先规划再执行，适合长任务 | 需要全局规划的任务 |
+| **Claude Agent SDK** | 官方标准，流式输出，MCP 集成 | 生产级应用 |
 
 ---
 
@@ -61,52 +83,37 @@ Agent 能回顾自身行为，检查错误并纠正。
 ### 基础 Agent 示例
 
 ```typescript
-import { Agent } from "@anthropic-ai/claude-code";
+import { query } from "@anthropic-ai/claude-agent-sdk";
 
-// 定义可用工具
-const tools = {
-  async search(query: string) {
-    return `搜索结果: 关于 "${query}" 的信息...`;
-  },
-  async calculate(expression: string) {
-    return eval(expression);
+// 运行 Agent（流式输出）
+for await (const message of query({
+  prompt: "北京的人口大约有多少？",
+  options: {
+    allowedTools: ["Bash", "Read", "Edit", "Write"]  // 允许的工具
   }
-};
-
-// 创建 Agent 实例
-const agent = new Agent({
-  model: "claude-opus-4-6",
-  tools,
-  systemPrompt: "你是一个乐于助人的助手，擅长回答问题和解决问题。"
-});
-
-// 运行 Agent
-const result = await agent.run("北京的人口有多少？");
-console.log(result);
+})) {
+  console.log(message);
+}
 ```
 
-### 带规划的 Agent 示例
+### 带工具定义的 Agent 示例
 
 ```typescript
-import { Agent } from "@anthropic-ai/claude-code";
+import { query } from "@anthropic-ai/claude-agent-sdk";
 
-const agent = new Agent({
-  model: "claude-opus-4-6",
-  tools: {
-    search,
-    readFile,
-    writeFile,
-    executeCommand
-  },
-  systemPrompt: `你是一个专业的软件工程师。
-    当收到任务时，先规划好步骤，再按顺序执行。`
-});
-
-// 复杂任务：自动完成项目搭建
-await agent.run(
-  "帮我创建一个 TypeScript 项目，包含 Express 服务器和 React 前端"
-);
+// 使用系统提示词配置 Agent 行为
+for await (const message of query({
+  prompt: "帮我创建一个简单的 HTTP 服务器，监听 3000 端口",
+  options: {
+    allowedTools: ["Bash", "Read", "Edit", "Write", "Glob", "Grep"],
+    systemPrompt: `你是一个专业的软件工程师。当收到任务时，先规划好步骤，再按顺序执行。`
+  }
+})) {
+  console.log(message);
+}
 ```
+
+> 以上为真实 API 示例。Claude Agent SDK 使用流式 `query()` 函数驱动 Agent，区别于类 `new Agent()` 的写法。
 
 ---
 
@@ -225,9 +232,10 @@ what-is-agent/
 
 ## 📖 扩展学习
 
-- [Claude Agent 官方文档](https://docs.anthropic.com/claude-code)
+- [Claude Agent SDK 官方文档](https://github.com/anthropics/claude-agent-sdk)
 - [Agent 架构设计指南](https://github.com/anthropics/anthropic-cookbook)
 - [斯坦福 AI Agent 论文](https://arxiv.org/abs/2308.03688)
+- [MCP 官方协议](https://modelcontextprotocol.io)
 
 ---
 
