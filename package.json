@@ -1,0 +1,20 @@
+{
+  "name": "what-is-agent",
+  "version": "1.0.0",
+  "description": "面向零基础新手的 Agent 概念教学仓库",
+  "main": "index.js",
+  "scripts": {
+    "example": "ts-node examples/01-basic.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-code": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -14,18 +14,31 @@ import { Agent } from "@anthropic-ai/claude-code";
 // ============================================================
 // 步骤 1：定义工具（Act - 行动）
 // ============================================================
-// 工具是 Agent 与外部世界交互的桥梁
+// 注意：以下工具均为【模拟实现】，仅供学习理解 Agent 工具调用机制
+// 真实项目中请使用真实的搜索 API、计算库等
+
 const tools = {
-  // 搜索工具：模拟网页搜索
+  // 搜索工具：模拟网页搜索（占位实现，非真实搜索）
   async search(query: string) {
     console.log(`🔍 执行搜索: "${query}"`);
+    // ⚠️ 占位实现 —— 这里返回的是假数据
+    // 真实场景应调用 Google Search API、Bing API 等
     return `搜索结果：关于 "${query}" 的相关信息...`;
   },
 
-  // 计算工具：模拟简单计算
+  // 计算工具：使用 Function 替代 eval()，避免 eval() 安全风险
+  // ⚠️ 注意：此实现仅适用于简单数学表达式，教学演示用
+  //        真实环境请使用专门的数学表达式解析库（如 mathjs）
   async calculate(expression: string) {
     console.log(`🧮 执行计算: ${expression}`);
-    return eval(expression);
+    try {
+      // 使用 Function 构造器比直接 eval() 稍安全（不访问局部作用域）
+      // 但仍然是【教学演示用途】，生产环境禁止使用
+      const safeEval = new Function(`return (${expression})`);
+      return safeEval();
+    } catch {
+      return "计算表达式格式错误";
+    }
   }
 };
 
@@ -47,9 +60,7 @@ async function main() {
   console.log("🤖 Agent 启动...\n");
 
   // 问题 1：需要搜索信息
-  const result1 = await agent.run(
-    "北京的人口大约有多少？"
-  );
+  const result1 = await agent.run("北京的人口大约有多少？");
   console.log("\n📤 Agent 回答:", result1);
 
   // 问题 2：需要计算
