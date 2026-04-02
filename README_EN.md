@@ -4,7 +4,7 @@
 
 ---
 
-> 🌐 **Language**: [中文](./README.md) | [English（当前）](./README_EN.md)
+> 🌐 **Language**: [中文](./README.md)
 
 ---
 
