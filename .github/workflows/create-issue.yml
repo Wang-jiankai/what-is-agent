@@ -1,0 +1,33 @@
+name: Create Issue
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: "Issue 标题"
+        required: true
+        type: string
+      body:
+        description: "Issue 内容"
+        required: true
+        type: string
+      labels:
+        description: "Labels（逗号分隔）"
+        required: false
+        type: string
+
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create issue
+        run: |
+          echo "${{ inputs.body }}" > body.md
+
+          gh issue create \
+            --repo "${{ github.repository }}" \
+            --title "${{ inputs.title }}" \
+            --body-file body.md \
+            ${{ inputs.labels && format('--label "{0}"', inputs.labels) || '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

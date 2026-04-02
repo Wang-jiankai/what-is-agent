@@ -1,0 +1,73 @@
+name: Dependency Check
+
+on:
+  schedule:
+    # 每 3 天检查一次
+    - cron: "0 9 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check outdated dependencies
+        id: outdated
+        run: |
+          npx npm-check-updates --format json --no-emphasis 2>/dev/null || echo "{}" > outdated.json
+
+          if [ -f outdated.json ] && [ -s outdated.json ]; then
+            COUNT=$(cat outdated.json | jq 'keys | length')
+            if [ "$COUNT" -gt 0 ]; then
+              echo "body<<EOF" >> $GITHUB_OUTPUT
+              echo "## 📦 依赖更新检测" >> $GITHUB_OUTPUT
+              echo "" >> $GITHUB_OUTPUT
+              echo "检测到 **$COUNT** 个依赖有新版本：" >> $GITHUB_OUTPUT
+              echo "" >> $GITHUB_OUTPUT
+              cat outdated.json | jq -r 'to_entries[] | "- **\(.key)**: \(.value.current) → \(.value.latest)"' >> $GITHUB_OUTPUT
+              echo "" >> $GITHUB_OUTPUT
+              echo "---" >> $GITHUB_OUTPUT
+              echo "_由 GitHub Actions 自动生成_" >> $GITHUB_OUTPUT
+              echo "EOF"
+            else
+              echo "body<<EOF" >> $GITHUB_OUTPUT
+              echo "✅ 所有依赖已是最新的" >> $GITHUB_OUTPUT
+              echo "EOF"
+            fi
+          else
+            echo "body<<EOF" >> $GITHUB_OUTPUT
+            echo "⚠️ 检测失败，请手动检查" >> $GITHUB_OUTPUT
+            echo "EOF"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create issue
+        if: steps.outdated.outputs.body
+        run: |
+          MONTH=$(date '+%Y-%m')
+          # 查找本月是否已有检测 issue
+          EXISTING=$(gh issue list \
+            --repo "${{ github.repository }}" \
+            --search "依赖更新检测 $MONTH" \
+            --limit 1 \
+            --json number \
+            --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING" ] && [ "$EXISTING" != "null" ]; then
+            gh issue comment "$EXISTING" \
+              --repo "${{ github.repository }}" \
+              --body "${{ steps.outdated.outputs.body }}"
+            echo "Updated issue #$EXISTING"
+          else
+            gh issue create \
+              --repo "${{ github.repository }}" \
+              --title "📦 依赖更新检测 $(date '+%Y-%m-%d')" \
+              --body "${{ steps.outdated.outputs.body }}" \
+              --label "dependency"
+            echo "Created new issue"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
