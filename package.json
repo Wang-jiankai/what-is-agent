@@ -1,7 +1,7 @@
 {
   "name": "what-is-agent",
   "version": "1.0.0",
-  "description": "A hands-on Agent tutorial for beginners — covers planning, memory, tools, MCP, skills, and production deployment",
+  "description": "Explore Agent concepts and practice — planning, memory, tools, MCP, skills, and production deployment",
   "main": "index.js",
   "scripts": {
     "example": "ts-node examples/01-basic.ts"
