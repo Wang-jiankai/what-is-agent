@@ -147,4 +147,4 @@ Loop:
 
 ## 🔗 相关资源
 
-- 继续学习：[03 - 记忆（Memory）](../03-memory.md)
+- 继续学习：[03 - 记忆（Memory）](../concepts/03-memory.md)
