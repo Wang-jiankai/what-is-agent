@@ -1,6 +1,6 @@
 # 🧠 What is Agent?
 
-> **"Agent" 是 AI 领域最核心的概念之一。** 本仓库面向零基础新手，通过清晰的概念讲解与可运行的代码示例，带你彻底理解什么是 Agent。
+> **"Agent" 是 AI 领域最核心的概念之一。** 本仓库通过清晰的概念讲解与可运行的代码示例，帮你彻底理解什么是 Agent。
 
 ---
 
@@ -15,7 +15,7 @@
 | 仓库 | 主题 | 一句话描述 |
 |------|------|-----------|
 | 🔗 [what-is-agent](https://github.com/Wang-jiankai/what-is-agent) | **Agent** | AI 的"大脑"，能自主规划与执行任务 |
-| 🔗 [what-is-skill](https://github.com/Wang-jiankai/what-is-skill) | **Skill** | AI 的"工具箱"，扩展能力的模块化插件 |
+| 🔗 [what-is-skill](https://github.com/Wang-jiankai/what-is-skill) | **Skill** | AI 的"SOP 手册"，把专家经验结构化打包 |
 | 🔗 [what-is-mcp](https://github.com/Wang-jiankai/what-is-mcp) | **MCP** | AI 的"接口标准"，连接外部世界的桥梁 |
 
 ---
