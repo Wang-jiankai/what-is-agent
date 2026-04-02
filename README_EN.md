@@ -15,7 +15,7 @@ This series contains three repositories to help you master the core concepts of 
 | Repository | Topic | One-liner |
 |------------|-------|-----------|
 | 🔗 [what-is-agent](https://github.com/Wang-jiankai/what-is-agent) | **Agent** | AI's "brain" — autonomously plans and executes tasks |
-| 🔗 [what-is-skill](https://github.com/Wang-jiankai/what-is-skill) | **Skill** | AI's "toolbox" — modular plugins that extend capabilities |
+| 🔗 [what-is-skill](https://github.com/Wang-jiankai/what-is-skill) | **Skill** | AI's "SOP manual" — structured domain expertise packaging |
 | 🔗 [what-is-mcp](https://github.com/Wang-jiankai/what-is-mcp) | **MCP** | AI's "interface standard" — a bridge to the external world |
 
 ---
@@ -40,7 +40,7 @@ This repository uses **Claude Agent SDK** as the primary teaching framework.
 | **Package** | `@anthropic-ai/claude-agent-sdk` |
 | **Latest Version** | v0.2.83 (2026-04-02) |
 | **Repository** | [github.com/anthropics/claude-agent-sdk](https://github.com/anthropics/claude-agent-sdk) |
-| **Positioning** | Anthropic official SDK, same底层 architecture as Claude Code |
+| **Positioning** | Anthropic official SDK, Claude Code's underlying architecture |
 | **Features** | Enterprise-grade, native MCP integration, lifecycle hooks, streaming output |
 
 > **Why not other frameworks?**
@@ -61,20 +61,26 @@ This repository uses **Claude Agent SDK** as the primary teaching framework.
 
 ## 💡 Core Concepts
 
-### 1. Planning
-Break down complex tasks into sub-steps and execute them systematically.
+### Internal Mechanisms (How Agent Works)
 
-### 2. Tool Use
-Agents interact with the external world through "tools" — code execution, web search, file operations.
+| Chapter | Topic | Description |
+|---------|-------|-------------|
+| 01 | What is Agent | Agent definition and core components |
+| 02 | Planning | Break down and execute complex tasks |
+| 03 | Memory | Session context + persistent storage |
+| 04 | Reflection | Review actions, check errors |
+| 05 | Reasoning | Chain-of-thought and model reasoning |
+| 06 | Self-Correction | ReAct loop and external verification |
 
-### 3. Memory
-Agents can persist conversation history, user preferences, and context for continuous interaction.
+### External Extensions (How Agent Connects to the World)
 
-### 4. Reflection
-Agents review their own actions, check for errors, and self-correct.
-
-### 5. Multi-Framework
-Understand the design philosophy and best-fit scenarios of different Agent frameworks.
+| Chapter | Topic | Description |
+|---------|-------|-------------|
+| 07 | Tool Use | Built-in and custom tools |
+| 08 | MCP | Extend capabilities via MCP protocol |
+| 09 | Skill | Agent Skills open standard |
+| 10 | Multi-Agent | Multiple agents working together |
+| 11 | Production Deployment | Environment variables, rate limiting, error handling |
 
 ---
 
@@ -164,32 +170,55 @@ what-is-agent/
 ├── .gitignore            # Git ignore rules
 │
 ├── concepts/             # 📚 Core concept articles (read with assets/ for best experience)
-│   ├── 01-what-is-agent.md
-│   ├── 02-planning.md
-│   ├── 03-memory.md
-│   ├── 04-reflection.md
-│   └── 05-frameworks.md
+│   ├── 01-what-is-agent.md       # What is Agent
+│   ├── 02-planning.md            # Planning
+│   ├── 03-memory.md              # Memory
+│   ├── 04-reflection.md          # Reflection
+│   ├── 05-reasoning.md          # Reasoning
+│   ├── 06-self-correction.md    # Self-Correction
+│   ├── 07-tool-use.md           # Tool Use
+│   ├── 08-mcp.md               # MCP
+│   ├── 09-skill.md              # Skill
+│   ├── 10-multi-agent.md        # Multi-Agent
+│   └── 11-deployment.md         # Production Deployment
 │
 ├── examples/             # 💻 Runnable code examples (each maps to one concept)
-│   ├── 01-basic.ts               # Maps to concepts/01: Agent basics
-│   ├── 02-with-planning.ts       # Maps to concepts/02: Planning
-│   ├── 03-with-memory.ts         # Maps to concepts/03: Memory
-│   ├── 04-with-reflection.ts     # Maps to concepts/04: Reflection
-│   └── 05-multi-framework.ts     # Maps to concepts/05: Frameworks
+│   ├── 01-basic.ts               # What is Agent
+│   ├── 02-with-planning.ts        # Planning
+│   ├── 03-memory.ts               # Memory
+│   ├── 04-reflection.ts           # Reflection
+│   ├── 05-reasoning.ts           # Reasoning
+│   ├── 06-self-correction.ts      # Self-Correction
+│   ├── 07-tool-use.ts            # Tool Use
+│   ├── 08-mcp.ts                 # MCP
+│   ├── 09-skill.ts               # Skill
+│   ├── 10-multi-agent.ts         # Multi-Agent
+│   └── 11-deployment.ts          # Production Deployment
 │
 ├── exercises/             # 🏋️ Exercises (one per concepts/ chapter)
 │   ├── 01-basic-exercise.md
 │   ├── 02-planning-exercise.md
 │   ├── 03-memory-exercise.md
 │   ├── 04-reflection-exercise.md
-│   └── 05-frameworks-exercise.md
+│   ├── 05-reasoning-exercise.md
+│   ├── 06-self-correction-exercise.md
+│   ├── 07-tool-use-exercise.md
+│   ├── 08-mcp-exercise.md
+│   ├── 09-skill-exercise.md
+│   ├── 10-multi-agent-exercise.md
+│   └── 11-deployment-exercise.md
 │
 ├── references/            # 📝 Exercise reference solutions (check after attempting)
 │   ├── 01-basic-solution.ts
-│   ├── 02-planning-solution.ts
 │   ├── 03-memory-solution.ts
 │   ├── 04-reflection-solution.ts
-│   └── 05-frameworks-solution.ts
+│   ├── 05-reasoning-solution.ts
+│   ├── 06-self-correction-solution.ts
+│   ├── 07-tool-use-solution.ts
+│   ├── 08-mcp-solution.ts
+│   ├── 09-skill-solution.ts
+│   ├── 10-multi-agent-solution.ts
+│   └── 11-deployment-solution.ts
 │
 └── assets/                # 🖼️ Architecture & flow diagrams (referenced by concepts/)
     ├── agent-architecture.png    # Core architecture diagram (read with concepts/01)
@@ -224,7 +253,7 @@ Step 4  →  Check references/01 reference solution (self-review)
            ↓
 Step 5  →  Move to next chapter (concepts/02 → examples/02 → ...)
 
-Repeat until all 5 chapters are complete.
+Repeat until all 11 chapters are complete.
 ```
 
 > **Tip:** Exercise difficulty increases with each chapter. Try to work through exercises independently before consulting `references/`.
