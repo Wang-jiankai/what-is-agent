@@ -64,33 +64,24 @@ async function reactDemo() {
   for (let i = 0; i < 5; i++) {
     console.log(`--- 第 ${i + 1} 轮 ---`);
 
-    const response = await new Promise<string>((resolve) => {
-      let result = "";
-      query({
-        prompt: `当前是第 ${i + 1} 轮。
+    let result = "";
+    for await (const message of query({
+      prompt: `当前是第 ${i + 1} 轮。
 
 ${i === 0 ? REACT_PROMPT : "请根据上一轮的结果，继续执行直到找到最大文件。"}`,
-        options: {
-          allowedTools: ["Bash", "Read", "Glob"],
-          systemPrompt: `你是一个遵循 ReAct 循环的助手。
+      options: {
+        allowedTools: ["Bash", "Read", "Glob"],
+        systemPrompt: `你是一个遵循 ReAct 循环的助手。
 每次输出格式：
 THINK: <你的推理>
 ACT: <工具调用，JSON格式，如 {"name": "Bash", "args": {"command": "ls -la"} }
 OBSERVE: <观察结果>
 ADJUST: <是否需要调整策略>`,
-        },
-      }).subscribe({
-        next(message) {
-          result += message;
-        },
-        complete() {
-          resolve(result);
-        },
-        error(err) {
-          resolve("错误：" + err);
-        },
-      });
-    });
+      },
+    })) {
+      result += message;
+    }
+    const response = result;
 
     console.log(response + "\n");
 

@@ -140,31 +140,22 @@ async function task3_fileSearchReplace() {
     step++;
     console.log(`--- 第 ${step} 轮 ---`);
 
-    const response = await new Promise<string>((resolve) => {
-      let result = "";
-      query({
-        prompt: `任务：${task}
+    let result = "";
+    for await (const message of query({
+      prompt: `任务：${task}
 
 可用工具：
 ${TOOL_LIST}
 
 每次用 ACTION 调用一个工具，或者 FINAL 结束。`,
-        options: {
-          allowedTools: [],
-          systemPrompt: "你是工具调用助手。",
-        },
-      }).subscribe({
-        next(m) {
-          result += m;
-        },
-        complete() {
-          resolve(result);
-        },
-        error(err: any) {
-          resolve("错误：" + err);
-        },
-      });
-    });
+      options: {
+        allowedTools: [],
+        systemPrompt: "你是工具调用助手。",
+      },
+    })) {
+      result += message;
+    }
+    const response = result;
 
     console.log(response);
 

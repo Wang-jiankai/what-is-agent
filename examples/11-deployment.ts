@@ -14,10 +14,9 @@
  */
 
 import { query } from "@anthropic-ai/claude-agent-sdk";
-import * as dotenv from "dotenv";
 
-// 加载 .env 文件
-dotenv.config();
+// 环境变量读取（Node.js 20+ 原生支持 .env 文件自动加载）
+// 如果环境变量未设置，可以手动加载：require('dotenv').config()
 
 // ============================================================
 // Part A：正确的环境变量读取

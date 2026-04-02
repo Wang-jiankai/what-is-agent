@@ -132,10 +132,9 @@ async function customToolsReActDemo() {
     step++;
     console.log(`--- 第 ${step} 轮 ---`);
 
-    const response = await new Promise<string>((resolve) => {
-      let result = "";
-      query({
-        prompt: `当前任务：${task}
+    let result = "";
+    for await (const message of query({
+      prompt: `当前任务：${task}
 
 历史记录：
 ${history}
@@ -149,9 +148,9 @@ THINK: <你的推理>
 ACTION: <工具调用，JSON格式 {"name": "工具名", "args": {"参数": "值"}}>
 或者：
 FINAL: <如果任务完成，输出最终结果>`,
-        options: {
-          allowedTools: [],
-          systemPrompt: `你是一个工具调用助手。
+      options: {
+        allowedTools: [],
+        systemPrompt: `你是一个工具调用助手。
 
 可用工具：
 ${TOOL_LIST}
@@ -160,19 +159,11 @@ ${TOOL_LIST}
 - 如果可以用工具完成，用 ACTION
 - 如果任务已完成，用 FINAL
 - 每次只做一个动作`,
-        },
-      }).subscribe({
-        next(message) {
-          result += message;
-        },
-        complete() {
-          resolve(result);
-        },
-        error(err: any) {
-          resolve("错误：" + err);
-        },
-      });
-    });
+      },
+    })) {
+      result += message;
+    }
+    const response = result;
 
     console.log(response);
     history += `\n[第 ${step} 轮]\n${response}\n`;

@@ -167,26 +167,17 @@ async function task3_mcpTestTool() {
   console.log("测试 MCP 服务器连接...\n");
 
   try {
-    const response = await new Promise<string>((resolve) => {
-      let result = "";
-      query({
-        prompt: "请列出你当前可以使用的所有工具，包括 MCP 服务器提供的工具。",
-        options: {
-          allowedTools: ["Read", "Bash", "Write", "Glob", "Grep"],
-          mcpServers: serverConfig,
-        },
-      }).subscribe({
-        next(m) {
-          result += m;
-        },
-        complete() {
-          resolve(result);
-        },
-        error(err: any) {
-          resolve("错误：" + err.message);
-        },
-      });
-    });
+    let result = "";
+    for await (const message of query({
+      prompt: "请列出你当前可以使用的所有工具，包括 MCP 服务器提供的工具。",
+      options: {
+        allowedTools: ["Read", "Bash", "Write", "Glob", "Grep"],
+        mcpServers: serverConfig,
+      },
+    })) {
+      result += message;
+    }
+    const response = result;
 
     console.log(response);
     console.log("\n✓ MCP 服务器连接成功！");
