@@ -1,6 +1,6 @@
 # 🧠 What is Agent?
 
-> **"Agent" is one of the core concepts in AI.** This repository is designed for absolute beginners, helping you thoroughly understand what an Agent is through clear concept explanations and runnable code examples.
+> **"Agent" is one of the core concepts in AI.** This repository uses clear concept explanations and runnable code examples to take you deep into Agent's core capabilities — from planning and memory to tools, MCP, and deployment.
 
 ---
 
