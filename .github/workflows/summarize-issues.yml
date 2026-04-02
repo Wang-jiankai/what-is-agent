@@ -1,0 +1,79 @@
+name: Weekly Issue Summary
+
+on:
+  schedule:
+    # 每周一早上 9 点运行
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch issues from all repos
+        id: fetch
+        run: |
+          fetch_repo() {
+            local repo=$1
+            echo "### 📦 $repo" >> summary.md
+            echo "" >> summary.md
+
+            # 获取近 7 天的新 issues
+            if issues=$(gh issue list --repo "$repo" --state open --search "created:>=$(date -d '7 days ago' '+%Y-%m-%d')" --limit 20 --json number,title,author,createdAt --jq '.[]'); then
+              if [ -n "$issues" ] && [ "$issues" != "null" ]; then
+                echo "$issues" | jq -r '| "**#\(.number)** \(.title) — @\(.author.login) (\(.createdAt[:10]))"' >> summary.md
+              else
+                echo "_近 7 天无新 Issue_" >> summary.md
+              fi
+            else
+              echo "_获取失败_" >> summary.md
+            fi
+            echo "" >> summary.md
+          }
+
+          echo "# 📋 Issue 周报 $(date '+%Y-%m-%d')" > summary.md
+          echo "" >> summary.md
+
+          fetch_repo "Wang-jiankai/what-is-agent"
+          fetch_repo "Wang-jiankai/what-is-mcp"
+          fetch_repo "Wang-jiankai/what-is-skill"
+
+          cat summary.md
+
+          echo "SUMMARY<<EOF" >> $GITHUB_OUTPUT
+          cat summary.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create or update issue
+        run: |
+          # 查找本月是否已有汇总 issue
+          MONTH=$(date '+%Y-%m')
+          EXISTING=$(gh issue list \
+            --repo "${{ github.repository }}" \
+            --search "Issue 周报 $MONTH" \
+            --limit 1 \
+            --json number \
+            --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING" ] && [ "$EXISTING" != "null" ]; then
+            # 更新已有 issue
+            gh issue comment "$EXISTING" \
+              --repo "${{ github.repository }}" \
+              --body "${{ steps.fetch.outputs.SUMMARY }}"
+            echo "Updated issue #$EXISTING"
+          else
+            # 创建新 issue
+            gh issue create \
+              --repo "${{ github.repository }}" \
+              --title "📋 Issue 周报 $(date '+%Y-%m-%d')" \
+              --body "${{ steps.fetch.outputs.SUMMARY }}" \
+              --label "weekly-summary"
+            echo "Created new issue"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
