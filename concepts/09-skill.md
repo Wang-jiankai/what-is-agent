@@ -51,8 +51,8 @@ for await (const message of query({
 | 话题 | 位置 |
 |------|------|
 | Skill 的三种含义（Claude Code /skills、Agent Skills 开放标准、MCP Tools） | [what-is-skill README](https://github.com/Wang-jiankai/what-is-skill) |
-| SKILL.md 的三层结构（YAML 元数据 + Instructions + 脚本） | [concepts/02-skill-structure.md](https://github.com/Wang-jiankai/what-is-skill/blob/main/concepts/02-skill-structure.md) |
-| 如何写高质量的 Instructions | [concepts/03-writing-instructions.md](https://github.com/Wang-jiankai/what-is-skill/blob/main/concepts/03-writing-instructions.md) |
+| SKILL.md 的三层结构（YAML 元数据 + Instructions + 脚本） | [concepts/07-SKILL.md格式与结构.md](https://github.com/Wang-jiankai/what-is-skill/blob/main/concepts/07-SKILL.md格式与结构.md) |
+| 如何写高质量的 Instructions | [concepts/09-写好Instructions.md](https://github.com/Wang-jiankai/what-is-skill/blob/main/concepts/09-写好Instructions.md) |
 | 真实 SKILL.md 示例 | [examples/](https://github.com/Wang-jiankai/what-is-skill/tree/main/examples) |
 
 ---
